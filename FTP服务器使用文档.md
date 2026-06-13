@@ -57,6 +57,7 @@ PERMISSION=readonly
 ALLOW_ANONYMOUS=true
 FTP_ENCODING=system
 MAX_DOWNLOAD_SIZE_MB=100
+SHOW_STARTUP_LOGS=true
 ```
 
 说明：
@@ -68,6 +69,7 @@ MAX_DOWNLOAD_SIZE_MB=100
 - `ALLOW_ANONYMOUS`：是否允许匿名访问。
 - `FTP_ENCODING`：FTP 命令与路径编码，默认 `system`，跟随系统首选编码。
 - `MAX_DOWNLOAD_SIZE_MB`：单个文件下载或双击打开的最大体积，默认 `100` MB，设置为 `0` 表示不限制。
+- `SHOW_STARTUP_LOGS`：启动窗口是否显示最近的守护进程/服务日志，默认 `true`。设置为 `false` 时不在窗口输出，但日志仍写入 `logs/`。
 
 ## FTP 文件夹限制
 
@@ -271,6 +273,14 @@ stop_control_panel.bat
 - `.ftp_runtime/`：运行时文件，例如 PID 文件和本地依赖包。
 
 这些文件夹由脚本自动创建。
+
+如果不希望 `start.bat` 或 `start_ftp_server.bat` 在启动后显示最近日志，可设置：
+
+```ini
+SHOW_STARTUP_LOGS=false
+```
+
+该开关只影响启动窗口显示，不影响日志文件写入。
 
 ## 安全建议
 

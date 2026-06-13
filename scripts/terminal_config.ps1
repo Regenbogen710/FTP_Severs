@@ -24,6 +24,7 @@ $ConfigOrder = @(
   "FTP_ENCODING",
   "MAX_DOWNLOAD_SIZE_MB",
   "WATCHDOG_INTERVAL_SECONDS",
+  "SHOW_STARTUP_LOGS",
   "AUTO_INSTALL_PYFTPDLIB",
   "PYFTPDLIB_PACKAGE",
   "ENABLE_FRONTEND"
@@ -43,6 +44,7 @@ $Defaults = @{
   FTP_ENCODING = "system"
   MAX_DOWNLOAD_SIZE_MB = "100"
   WATCHDOG_INTERVAL_SECONDS = "5"
+  SHOW_STARTUP_LOGS = "true"
   AUTO_INSTALL_PYFTPDLIB = "false"
   PYFTPDLIB_PACKAGE = "pyftpdlib"
   ENABLE_FRONTEND = "false"
@@ -121,6 +123,9 @@ MAX_DOWNLOAD_SIZE_MB=$($Config.MAX_DOWNLOAD_SIZE_MB)
 
 # Watchdog behavior.
 WATCHDOG_INTERVAL_SECONDS=$($Config.WATCHDOG_INTERVAL_SECONDS)
+
+# Show recent watchdog/server logs in the start window after startup.
+SHOW_STARTUP_LOGS=$($Config.SHOW_STARTUP_LOGS)
 
 # If true, hidden watchdogs may install pyftpdlib without asking.
 # Default false keeps installation in the visible start/config flow, where the user is asked first.
@@ -293,6 +298,7 @@ function Validate-Config {
 
   $Config.DANGEROUS_ALLOW_ANONYMOUS_DELETE = Normalize-Bool $Config.DANGEROUS_ALLOW_ANONYMOUS_DELETE
   $Config.ALLOW_ANONYMOUS = Normalize-Bool $Config.ALLOW_ANONYMOUS
+  $Config.SHOW_STARTUP_LOGS = Normalize-Bool $Config.SHOW_STARTUP_LOGS
   $Config.AUTO_INSTALL_PYFTPDLIB = Normalize-Bool $Config.AUTO_INSTALL_PYFTPDLIB
   $Config.ENABLE_FRONTEND = Normalize-Bool $Config.ENABLE_FRONTEND
 
@@ -345,6 +351,7 @@ function Show-Config {
   Write-Host "FTP_ENCODING: $($Config.FTP_ENCODING)"
   Write-Host "MAX_DOWNLOAD_SIZE_MB: $($Config.MAX_DOWNLOAD_SIZE_MB)"
   Write-Host "WATCHDOG_INTERVAL_SECONDS: $($Config.WATCHDOG_INTERVAL_SECONDS)"
+  Write-Host "SHOW_STARTUP_LOGS: $($Config.SHOW_STARTUP_LOGS)"
   Write-Host "AUTO_INSTALL_PYFTPDLIB: $($Config.AUTO_INSTALL_PYFTPDLIB)"
   Write-Host "ENABLE_FRONTEND: $($Config.ENABLE_FRONTEND)"
   Write-Host ""
@@ -380,9 +387,10 @@ while ($true) {
   Write-Host "7. Set FTP encoding"
   Write-Host "8. Toggle frontend"
   Write-Host "9. Set max download size"
-  Write-Host "10. Check/repair environment"
-  Write-Host "11. Save and exit"
-  Write-Host "12. Exit without saving"
+  Write-Host "10. Toggle startup logs"
+  Write-Host "11. Check/repair environment"
+  Write-Host "12. Save and exit"
+  Write-Host "13. Exit without saving"
   Write-Host ""
 
   $choice = Read-Choice "Choose"
@@ -436,13 +444,17 @@ while ($true) {
         Save-Config $config
       }
       "10" {
-        Repair-Environment
+        $config.SHOW_STARTUP_LOGS = if ((Normalize-Bool $config.SHOW_STARTUP_LOGS) -eq "true") { "false" } else { "true" }
+        Save-Config $config
       }
       "11" {
+        Repair-Environment
+      }
+      "12" {
         Save-Config $config
         exit 0
       }
-      "12" {
+      "13" {
         exit 0
       }
       default {

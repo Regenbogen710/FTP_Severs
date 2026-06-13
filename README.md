@@ -47,6 +47,7 @@ ftp://192.168.110.107
 | `MAX_DOWNLOAD_SIZE_MB` | 单个文件下载/双击打开的最大体积，默认 `100`，设置为 `0` 表示不限制。 |
 | `ENABLE_FRONTEND` | 是否启用 WebUI，默认 `false`。 |
 | `WATCHDOG_INTERVAL_SECONDS` | 守护进程检查间隔。 |
+| `SHOW_STARTUP_LOGS` | 启动窗口是否显示最近的守护进程/服务日志，默认 `true`。日志文件始终会写入 `logs/`。 |
 | `AUTO_INSTALL_PYFTPDLIB` | 是否允许隐藏守护进程直接安装依赖，默认 `false`。普通启动流程会先在终端询问。 |
 
 ## 环境补全
