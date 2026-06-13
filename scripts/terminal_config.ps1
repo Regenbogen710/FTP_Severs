@@ -2,7 +2,10 @@ $ErrorActionPreference = "Stop"
 
 $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 $BaseDir = Split-Path -Parent $ScriptDir
-$ConfigPath = Join-Path $BaseDir "config\ftp_config.ini"
+$ConfigPath = Join-Path $BaseDir "config.ini"
+if (-not (Test-Path -LiteralPath $ConfigPath)) {
+  $ConfigPath = Join-Path $BaseDir "config\ftp_config.ini"
+}
 if (-not (Test-Path -LiteralPath $ConfigPath)) {
   $ConfigPath = Join-Path $BaseDir "ftp_config.ini"
 }
@@ -116,7 +119,7 @@ AUTO_INSTALL_PYFTPDLIB=$($Config.AUTO_INSTALL_PYFTPDLIB)
 PYFTPDLIB_PACKAGE=$($Config.PYFTPDLIB_PACKAGE)
 
 # Local web control panel.
-# Default is false. Use terminal_config.bat for normal configuration.
+# Default is false. Use control_terminal.bat for normal configuration.
 ENABLE_FRONTEND=$($Config.ENABLE_FRONTEND)
 "@
 

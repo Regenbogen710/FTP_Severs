@@ -2,8 +2,10 @@
 
 ## 文件说明
 
-- `ftp_config.ini`：FTP 与前端控制面板的配置文件。
-- `terminal_config.bat`：终端配置菜单，推荐默认使用。
+- `config.ini`：FTP 与前端控制面板的主要配置文件。
+- `ftp_config.ini`：旧版兼容配置文件。
+- `control_terminal.bat` / `控制终端.bat`：终端控制入口，推荐默认使用。
+- `terminal_config.bat`：终端配置菜单，供兼容使用。
 - `install_pyftpdlib.bat`：首次使用时安装 FTP 服务依赖。
 - `start_ftp_server.bat`：启动 FTP 服务与双守护进程。
 - `stop_ftp_server.bat`：停止 FTP 服务与双守护进程。
@@ -17,10 +19,10 @@
 
 1. 打开当前文件夹。
 2. 双击运行 `install_pyftpdlib.bat`。
-3. 双击运行 `terminal_config.bat`，根据终端菜单修改权限、目录、匿名访问等配置。
+3. 双击运行 `control_terminal.bat` 或 `控制终端.bat`，根据终端菜单修改权限、目录、匿名访问等配置。
 4. 双击运行 `start_ftp_server.bat` 启动 FTP 服务。
 
-默认不启用前端控制面板。若确实需要使用前端，先在 `terminal_config.bat` 中开启前端，或手动设置：
+默认不启用前端控制面板。若确实需要使用前端，先在 `control_terminal.bat` 中开启前端，或手动设置：
 
 ```ini
 ENABLE_FRONTEND=true
@@ -34,7 +36,7 @@ http://127.0.0.1:8088
 
 ## 前端控制面板开关
 
-前端是否允许启动由 `ftp_config.ini` 控制，默认关闭：
+前端是否允许启动由 `config.ini` 控制，默认关闭：
 
 ```ini
 ENABLE_FRONTEND=false
@@ -116,7 +118,7 @@ PERMISSION=readwrite
 也可以直接运行：
 
 ```text
-terminal_config.bat
+control_terminal.bat
 ```
 
 然后选择 `Set permission` 修改权限模式。
@@ -142,7 +144,7 @@ FTP_ENCODING=system
 终端修改方式：
 
 ```text
-terminal_config.bat
+control_terminal.bat
 ```
 
 然后选择 `Set FTP encoding`。

@@ -21,9 +21,12 @@ else:
     BASE_DIR = Path(__file__).resolve().parent.parent
 SCRIPT_DIR = BASE_DIR / "scripts"
 WEB_DIR = BASE_DIR / "webui"
-CONFIG_PATH = BASE_DIR / "config" / "ftp_config.ini"
-if not CONFIG_PATH.exists():
-    CONFIG_PATH = BASE_DIR / "ftp_config.ini"
+CONFIG_CANDIDATES = [
+    BASE_DIR / "config.ini",
+    BASE_DIR / "config" / "ftp_config.ini",
+    BASE_DIR / "ftp_config.ini",
+]
+CONFIG_PATH = next((path for path in CONFIG_CANDIDATES if path.exists()), CONFIG_CANDIDATES[0])
 RUNTIME_DIR = BASE_DIR / ".ftp_runtime"
 
 CONFIG_KEYS = [
@@ -552,7 +555,7 @@ def main():
         raise SystemExit("Control panel must bind to localhost only.")
 
     if not parse_bool(read_config().get("ENABLE_FRONTEND", "false")):
-        print("Control panel disabled by ENABLE_FRONTEND=false in ftp_config.ini.", flush=True)
+        print("Control panel disabled by ENABLE_FRONTEND=false in config.ini.", flush=True)
         return
 
     RUNTIME_DIR.mkdir(exist_ok=True)

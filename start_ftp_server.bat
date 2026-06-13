@@ -3,14 +3,16 @@ setlocal
 
 cd /d "%~dp0"
 
-if exist "config\ftp_config.ini" (
+if exist "config.ini" (
+  set "CONFIG_FILE=config.ini"
+) else if exist "config\ftp_config.ini" (
   set "CONFIG_FILE=config\ftp_config.ini"
 ) else (
   set "CONFIG_FILE=ftp_config.ini"
 )
 
 if not exist "%CONFIG_FILE%" (
-  echo Missing ftp_config.ini or config\ftp_config.ini
+  echo Missing config.ini, ftp_config.ini, or config\ftp_config.ini
   pause
   exit /b 1
 )
@@ -29,7 +31,7 @@ if exist ".ftp_runtime\ftp_server.started" del /f /q ".ftp_runtime\ftp_server.st
 echo Starting FTP server with dual watchdogs...
 echo Config: %CD%\%CONFIG_FILE%
 echo Logs:   %CD%\logs
-echo Terminal config: config.bat
+echo Terminal config: control_terminal.bat
 
 start "FTP Watchdog A" /min powershell -NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -File "%~dp0scripts\ftp_watchdog.ps1" -WatchdogName A
 start "FTP Watchdog B" /min powershell -NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -File "%~dp0scripts\ftp_watchdog.ps1" -WatchdogName B

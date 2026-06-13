@@ -11,7 +11,10 @@ if ($WatchdogName -ne "A" -and $WatchdogName -ne "B") {
 
 $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 $BaseDir = Split-Path -Parent $ScriptDir
-$ConfigPath = Join-Path $BaseDir "config\ftp_config.ini"
+$ConfigPath = Join-Path $BaseDir "config.ini"
+if (-not (Test-Path -LiteralPath $ConfigPath)) {
+  $ConfigPath = Join-Path $BaseDir "config\ftp_config.ini"
+}
 if (-not (Test-Path -LiteralPath $ConfigPath)) {
   $ConfigPath = Join-Path $BaseDir "ftp_config.ini"
 }
