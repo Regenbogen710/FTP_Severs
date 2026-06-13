@@ -1,0 +1,27 @@
+# Runtime state
+.ftp_runtime/
+logs/
+*.log
+
+# Python cache and local virtual environments
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Build scratch space
+.build_deps/
+.dist_build/
+*.spec
+
+# Keep the distributable zip, ignore the expanded duplicate package
+dist/ACM_FTP_Server_Standalone/
+
+# Local editor/system files
+.idea/
+.vscode/
+Thumbs.db
+Desktop.ini
+
+# External experiments or cloned references
+mattpocock-teach-skill/

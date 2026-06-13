@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>FTP 控制面板</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/styles.css">
+  <script src="/app.js" defer></script>
+</head>
+<body>
+  <main class="shell">
+    <header class="topbar">
+      <div>
+        <p class="eyebrow">ACM 实验室</p>
+        <h1>FTP 控制面板</h1>
+      </div>
+      <div class="status-pill" id="serverState">读取状态中</div>
+    </header>
+
+    <section class="toolbar" aria-label="服务操作">
+      <button class="primary" id="startBtn" type="button">启动 FTP</button>
+      <button class="danger" id="stopBtn" type="button">停止 FTP</button>
+      <button id="refreshBtn" type="button">刷新</button>
+      <span class="hint" id="lastUpdated"></span>
+    </section>
+
+    <section class="notice" id="message" role="status" aria-live="polite"></section>
+
+    <section class="panel">
+      <div class="panel-head">
+        <h2>运行状态</h2>
+      </div>
+      <dl class="status-grid">
+        <div>
+          <dt>FTP 地址</dt>
+          <dd id="ftpUrl">-</dd>
+        </div>
+        <div>
+          <dt>FTP 根目录</dt>
+          <dd id="ftpRoot">-</dd>
+        </div>
+        <div>
+          <dt>权限</dt>
+          <dd id="ftpPermission">-</dd>
+        </div>
+        <div>
+          <dt>守护进程</dt>
+          <dd id="watchdogs">-</dd>
+        </div>
+      </dl>
+    </section>
+
+    <form class="panel config-form" id="configForm">
+      <div class="panel-head">
+        <h2>配置</h2>
+        <button class="primary" type="submit">保存配置</button>
+      </div>
+
+      <div class="form-grid">
+        <label>
+          <span>FTP 文件夹</span>
+          <input id="FTP_ROOT" name="FTP_ROOT" autocomplete="off" required>
+        </label>
+        <label>
+          <span>监听地址</span>
+          <input id="HOST" name="HOST" autocomplete="off" required>
+        </label>
+        <label>
+          <span>端口</span>
+          <input id="PORT" name="PORT" inputmode="numeric" required>
+        </label>
+        <label>
+          <span>权限模式</span>
+          <select id="PERMISSION" name="PERMISSION">
+            <option value="readonly">readonly</option>
+            <option value="upload">upload</option>
+            <option value="readwrite">readwrite</option>
+            <option value="full">full</option>
+            <option value="custom">custom</option>
+          </select>
+        </label>
+        <label>
+          <span>自定义权限</span>
+          <input id="CUSTOM_PERMISSIONS" name="CUSTOM_PERMISSIONS" autocomplete="off">
+        </label>
+        <label>
+          <span>被动端口</span>
+          <input id="PASSIVE_PORTS" name="PASSIVE_PORTS" autocomplete="off">
+        </label>
+        <label>
+          <span>FTP 编码</span>
+          <input id="FTP_ENCODING" name="FTP_ENCODING" autocomplete="off" placeholder="system / utf-8 / gbk">
+        </label>
+        <label>
+          <span>用户名</span>
+          <input id="USERNAME" name="USERNAME" autocomplete="username">
+        </label>
+        <label>
+          <span>新密码</span>
+          <input id="PASSWORD" name="PASSWORD" type="password" autocomplete="new-password" placeholder="留空则不修改">
+        </label>
+        <label>
+          <span>守护间隔秒数</span>
+          <input id="WATCHDOG_INTERVAL_SECONDS" name="WATCHDOG_INTERVAL_SECONDS" inputmode="numeric">
+        </label>
+        <label>
+          <span>pyftpdlib 包名</span>
+          <input id="PYFTPDLIB_PACKAGE" name="PYFTPDLIB_PACKAGE" autocomplete="off">
+        </label>
+      </div>
+
+      <div class="toggles">
+        <label class="check">
+          <input id="ALLOW_ANONYMOUS" name="ALLOW_ANONYMOUS" type="checkbox">
+          <span>允许匿名访问</span>
+        </label>
+        <label class="check">
+          <input id="DANGEROUS_ALLOW_ANONYMOUS_DELETE" name="DANGEROUS_ALLOW_ANONYMOUS_DELETE" type="checkbox">
+          <span>允许匿名删除</span>
+        </label>
+        <label class="check">
+          <input id="AUTO_INSTALL_PYFTPDLIB" name="AUTO_INSTALL_PYFTPDLIB" type="checkbox">
+          <span>启动时自动安装依赖</span>
+        </label>
+        <label class="check">
+          <input id="ENABLE_FRONTEND" name="ENABLE_FRONTEND" type="checkbox">
+          <span>开启前端控制面板</span>
+        </label>
+      </div>
+    </form>
+  </main>
+</body>
+</html>
