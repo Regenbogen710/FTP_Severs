@@ -23,6 +23,20 @@ if not exist "scripts\ftp_watchdog.ps1" (
   exit /b 1
 )
 
+if not exist "scripts\ensure_environment.ps1" (
+  echo Missing scripts\ensure_environment.ps1
+  pause
+  exit /b 1
+)
+
+powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0scripts\ensure_environment.ps1" -Mode Ftp
+if %ERRORLEVEL% NEQ 0 (
+  echo.
+  echo Environment setup was canceled or failed. FTP service was not started.
+  pause
+  exit /b 1
+)
+
 if not exist ".ftp_runtime" mkdir ".ftp_runtime" >nul 2>nul
 if not exist "logs" mkdir "logs" >nul 2>nul
 if exist ".ftp_runtime\shutdown.request" del /f /q ".ftp_runtime\shutdown.request" >nul 2>nul
@@ -38,5 +52,4 @@ start "FTP Watchdog B" /min powershell -NoProfile -ExecutionPolicy Bypass -Windo
 
 echo.
 echo Started. Use stop_ftp_server.bat to stop the FTP service and watchdogs.
-echo If this is the first run, run install_pyftpdlib.bat before starting.
 pause

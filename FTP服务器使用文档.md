@@ -5,7 +5,7 @@
 - `config.ini`：FTP 与前端控制面板的主要配置文件。
 - `ftp_config.ini`：旧版兼容配置文件。
 - `config.bat`：终端配置入口，推荐默认使用。
-- `install_pyftpdlib.bat`：首次使用时安装 FTP 服务依赖。
+- `install_pyftpdlib.bat`：源码模式下检查并补全 Python/pip/pyftpdlib 环境。
 - `start_ftp_server.bat`：启动 FTP 服务与双守护进程。
 - `stop_ftp_server.bat`：停止 FTP 服务与双守护进程。
 - `shutdown.bat`：正式关闭 FTP 服务与双守护进程。
@@ -17,9 +17,10 @@
 ## 首次使用
 
 1. 打开当前文件夹。
-2. 双击运行 `install_pyftpdlib.bat`。
-3. 双击运行 `config.bat`，根据终端菜单修改权限、目录、匿名访问等配置。
-4. 双击运行 `start_ftp_server.bat` 启动 FTP 服务。
+2. 双击运行 `config.bat`，根据终端菜单修改权限、目录、匿名访问等配置。
+3. 双击运行 `start_ftp_server.bat` 启动 FTP 服务。
+
+启动时会先检查运行环境。源码模式下如果缺少 Python 3、pip 或 `pyftpdlib`，终端会先询问是否安装；输入 `Y` 后会自动补全环境。打包版本自带 exe，正常不需要安装 Python。
 
 默认不启用前端控制面板。若确实需要使用前端，先在 `config.bat` 中开启前端，或手动设置：
 
@@ -147,6 +148,22 @@ config.bat
 ```
 
 然后选择 `Set FTP encoding`。
+
+## 环境检查与自动补全
+
+源码模式运行依赖 Python 3、pip 和 `pyftpdlib`。当环境不完整时，`start_ftp_server.bat` 会先询问是否自动补全：
+
+- 缺少 Python 3：尝试通过 Windows `winget` 安装 Python。
+- 缺少 pip：尝试通过 `ensurepip` 修复。
+- 缺少 `pyftpdlib`：安装到 `.ftp_runtime/packages`，不写入系统 Python 目录。
+
+也可以运行：
+
+```text
+config.bat
+```
+
+然后选择 `Check/repair environment` 手动检查。
 
 ## 匿名删除保护
 

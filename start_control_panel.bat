@@ -19,6 +19,16 @@ if /i "%ENABLE_FRONTEND%"=="false" (
   exit /b 0
 )
 
+if not exist "%~dp0bin\control_panel.exe" (
+  powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0scripts\ensure_environment.ps1" -Mode ControlPanel
+  if %ERRORLEVEL% NEQ 0 (
+    echo.
+    echo Environment setup was canceled or failed. Control panel was not started.
+    pause
+    exit /b 1
+  )
+)
+
 if exist "%~dp0bin\control_panel.exe" (
   echo Starting FTP Control Panel...
   echo URL: http://127.0.0.1:8088

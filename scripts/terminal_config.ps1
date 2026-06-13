@@ -115,6 +115,9 @@ FTP_ENCODING=$($Config.FTP_ENCODING)
 
 # Watchdog behavior.
 WATCHDOG_INTERVAL_SECONDS=$($Config.WATCHDOG_INTERVAL_SECONDS)
+
+# If true, hidden watchdogs may install pyftpdlib without asking.
+# Default false keeps installation in the visible start/config flow, where the user is asked first.
 AUTO_INSTALL_PYFTPDLIB=$($Config.AUTO_INSTALL_PYFTPDLIB)
 PYFTPDLIB_PACKAGE=$($Config.PYFTPDLIB_PACKAGE)
 
@@ -331,6 +334,18 @@ function Read-Choice {
   return (Read-Host $Prompt).Trim()
 }
 
+function Repair-Environment {
+  $ensureScript = Join-Path $ScriptDir "ensure_environment.ps1"
+  if (-not (Test-Path -LiteralPath $ensureScript)) {
+    throw "Missing scripts\ensure_environment.ps1."
+  }
+
+  & powershell -NoProfile -ExecutionPolicy Bypass -File $ensureScript -Mode Ftp
+  if ($LASTEXITCODE -ne 0) {
+    throw "Environment check failed or was canceled."
+  }
+}
+
 $config = Read-Config
 
 while ($true) {
@@ -343,8 +358,9 @@ while ($true) {
   Write-Host "6. Set username/password"
   Write-Host "7. Set FTP encoding"
   Write-Host "8. Toggle frontend"
-  Write-Host "9. Save and exit"
-  Write-Host "10. Exit without saving"
+  Write-Host "9. Check/repair environment"
+  Write-Host "10. Save and exit"
+  Write-Host "11. Exit without saving"
   Write-Host ""
 
   $choice = Read-Choice "Choose"
@@ -393,10 +409,13 @@ while ($true) {
         Save-Config $config
       }
       "9" {
+        Repair-Environment
+      }
+      "10" {
         Save-Config $config
         exit 0
       }
-      "10" {
+      "11" {
         exit 0
       }
       default {

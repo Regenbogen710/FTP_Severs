@@ -25,6 +25,7 @@ ftp://192.168.110.107
 - `start_ftp_server.bat`：启动 FTP 服务和双守护进程。
 - `shutdown.bat`：关闭 FTP 服务，同时让守护进程退出。
 - `config.bat`：终端配置入口，默认推荐使用。
+- `install_pyftpdlib.bat`：源码模式下检查并补全 Python/pip/pyftpdlib 环境。
 - `start_control_panel.bat`：启动本地 WebUI，需先在配置中启用。
 - `config.ini`：主要配置文件。
 - `ftp_config.ini`：兼容旧路径的配置文件。
@@ -45,6 +46,15 @@ ftp://192.168.110.107
 | `FTP_ENCODING` | FTP 命令和路径编码，默认 `system`，即跟随系统编码。 |
 | `ENABLE_FRONTEND` | 是否启用 WebUI，默认 `false`。 |
 | `WATCHDOG_INTERVAL_SECONDS` | 守护进程检查间隔。 |
+| `AUTO_INSTALL_PYFTPDLIB` | 是否允许隐藏守护进程直接安装依赖，默认 `false`。普通启动流程会先在终端询问。 |
+
+## 环境补全
+
+打包版本包含 `bin/ftp_server.exe` 和 `bin/control_panel.exe`，正常使用不需要额外安装 Python。
+
+源码模式下，`start_ftp_server.bat` 会在启动守护进程前检查 Python 3、pip 和 `pyftpdlib`。如果缺少组件，会先在终端询问；输入 `Y` 同意后，脚本会尝试用 `winget` 安装 Python，并用 `pip` 将 `pyftpdlib` 安装到 `.ftp_runtime/packages`。
+
+也可以在 `config.bat` 中选择 `Check/repair environment` 手动检查和修复环境。
 
 ## 权限模式
 
