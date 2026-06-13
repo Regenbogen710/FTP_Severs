@@ -119,7 +119,7 @@ AUTO_INSTALL_PYFTPDLIB=$($Config.AUTO_INSTALL_PYFTPDLIB)
 PYFTPDLIB_PACKAGE=$($Config.PYFTPDLIB_PACKAGE)
 
 # Local web control panel.
-# Default is false. Use control_terminal.bat for normal configuration.
+# Default is false. Use config.bat for normal configuration.
 ENABLE_FRONTEND=$($Config.ENABLE_FRONTEND)
 "@
 

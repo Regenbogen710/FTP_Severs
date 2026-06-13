@@ -15,7 +15,7 @@ ftp://192.168.110.107
 推荐使用已经打包好的独立版本：
 
 1. 解压 `dist/ACM_FTP_Server_Standalone.zip`。
-2. 运行 `control_terminal.bat` 或 `控制终端.bat`，也可以手动编辑根目录的 `config.ini`。
+2. 运行 `config.bat`，也可以手动编辑根目录的 `config.ini`。
 3. 运行 `start.bat` 启动 FTP 服务。
 4. 在资源管理器地址栏输入 `ftp://192.168.110.107`。
 5. 需要关闭时运行 `shutdown.bat`。
@@ -24,8 +24,7 @@ ftp://192.168.110.107
 
 - `start_ftp_server.bat`：启动 FTP 服务和双守护进程。
 - `shutdown.bat`：关闭 FTP 服务，同时让守护进程退出。
-- `control_terminal.bat` / `控制终端.bat`：终端控制入口。
-- `terminal_config.bat`：终端配置入口，默认推荐使用。
+- `config.bat`：终端配置入口，默认推荐使用。
 - `start_control_panel.bat`：启动本地 WebUI，需先在配置中启用。
 - `config.ini`：主要配置文件。
 - `ftp_config.ini`：兼容旧路径的配置文件。
@@ -87,9 +86,7 @@ WebUI 是可选的本地控制面板，默认关闭。需要使用时：
 ├── config.ini
 ├── start_ftp_server.bat
 ├── shutdown.bat
-├── control_terminal.bat
-├── 控制终端.bat
-├── terminal_config.bat
+├── config.bat
 ├── start_control_panel.bat
 ├── scripts/
 ├── webui/
@@ -106,8 +103,6 @@ WebUI 是可选的本地控制面板，默认关闭。需要使用时：
 - `start.bat`
 - `shutdown.bat`
 - `config.ini`
-- `control_terminal.bat`
-- `控制终端.bat`
 - `config.bat`
 - `webui.bat`
 - `bin/ftp_server.exe`

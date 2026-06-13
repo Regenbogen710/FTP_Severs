@@ -31,7 +31,7 @@ if exist ".ftp_runtime\ftp_server.started" del /f /q ".ftp_runtime\ftp_server.st
 echo Starting FTP server with dual watchdogs...
 echo Config: %CD%\%CONFIG_FILE%
 echo Logs:   %CD%\logs
-echo Terminal config: control_terminal.bat
+echo Terminal config: config.bat
 
 start "FTP Watchdog A" /min powershell -NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -File "%~dp0scripts\ftp_watchdog.ps1" -WatchdogName A
 start "FTP Watchdog B" /min powershell -NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -File "%~dp0scripts\ftp_watchdog.ps1" -WatchdogName B
