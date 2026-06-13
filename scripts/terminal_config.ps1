@@ -22,9 +22,7 @@ $ConfigOrder = @(
   "PASSWORD",
   "PASSIVE_PORTS",
   "FTP_ENCODING",
-  "MAX_DOWNLOAD_SIZE_MB",
   "WATCHDOG_INTERVAL_SECONDS",
-  "SHOW_STARTUP_LOGS",
   "AUTO_INSTALL_PYFTPDLIB",
   "PYFTPDLIB_PACKAGE",
   "ENABLE_FRONTEND"
@@ -42,9 +40,7 @@ $Defaults = @{
   PASSWORD = "change-me-before-use"
   PASSIVE_PORTS = "60000-60050"
   FTP_ENCODING = "system"
-  MAX_DOWNLOAD_SIZE_MB = "100"
   WATCHDOG_INTERVAL_SECONDS = "5"
-  SHOW_STARTUP_LOGS = "true"
   AUTO_INSTALL_PYFTPDLIB = "false"
   PYFTPDLIB_PACKAGE = "pyftpdlib"
   ENABLE_FRONTEND = "false"
@@ -117,15 +113,8 @@ PASSIVE_PORTS=$($Config.PASSIVE_PORTS)
 # Common values: system, utf-8, gbk, gb2312, big5, cp936
 FTP_ENCODING=$($Config.FTP_ENCODING)
 
-# Maximum file size allowed for FTP download/open requests.
-# Set 0 for unlimited.
-MAX_DOWNLOAD_SIZE_MB=$($Config.MAX_DOWNLOAD_SIZE_MB)
-
 # Watchdog behavior.
 WATCHDOG_INTERVAL_SECONDS=$($Config.WATCHDOG_INTERVAL_SECONDS)
-
-# Show recent watchdog/server logs in the start window after startup.
-SHOW_STARTUP_LOGS=$($Config.SHOW_STARTUP_LOGS)
 
 # If true, hidden watchdogs may install pyftpdlib without asking.
 # Default false keeps installation in the visible start/config flow, where the user is asked first.
@@ -194,19 +183,6 @@ function Validate-Port {
   }
   if ($number -lt $Min -or $number -gt 65535) {
     throw "$Name must be between $Min and 65535."
-  }
-  return [string]$number
-}
-
-function Validate-NonNegativeInt {
-  param([string]$Name, [string]$Value, [int]$Max = 1048576)
-  Assert-NoNewline $Name $Value
-  $number = 0
-  if (-not [int]::TryParse($Value, [ref]$number)) {
-    throw "$Name must be a number."
-  }
-  if ($number -lt 0 -or $number -gt $Max) {
-    throw "$Name must be between 0 and $Max."
   }
   return [string]$number
 }
@@ -298,7 +274,6 @@ function Validate-Config {
 
   $Config.DANGEROUS_ALLOW_ANONYMOUS_DELETE = Normalize-Bool $Config.DANGEROUS_ALLOW_ANONYMOUS_DELETE
   $Config.ALLOW_ANONYMOUS = Normalize-Bool $Config.ALLOW_ANONYMOUS
-  $Config.SHOW_STARTUP_LOGS = Normalize-Bool $Config.SHOW_STARTUP_LOGS
   $Config.AUTO_INSTALL_PYFTPDLIB = Normalize-Bool $Config.AUTO_INSTALL_PYFTPDLIB
   $Config.ENABLE_FRONTEND = Normalize-Bool $Config.ENABLE_FRONTEND
 
@@ -315,7 +290,6 @@ function Validate-Config {
 
   $Config.PASSIVE_PORTS = Validate-PassivePorts $Config.PASSIVE_PORTS
   $Config.FTP_ENCODING = Validate-Encoding $Config.FTP_ENCODING
-  $Config.MAX_DOWNLOAD_SIZE_MB = Validate-NonNegativeInt "MAX_DOWNLOAD_SIZE_MB" $Config.MAX_DOWNLOAD_SIZE_MB
   $interval = [int](Validate-Port "WATCHDOG_INTERVAL_SECONDS" $Config.WATCHDOG_INTERVAL_SECONDS)
   if ($interval -gt 3600) {
     throw "WATCHDOG_INTERVAL_SECONDS must be 3600 or less."
@@ -349,9 +323,7 @@ function Show-Config {
   Write-Host "DANGEROUS_ALLOW_ANONYMOUS_DELETE: $($Config.DANGEROUS_ALLOW_ANONYMOUS_DELETE)"
   Write-Host "PASSIVE_PORTS: $($Config.PASSIVE_PORTS)"
   Write-Host "FTP_ENCODING: $($Config.FTP_ENCODING)"
-  Write-Host "MAX_DOWNLOAD_SIZE_MB: $($Config.MAX_DOWNLOAD_SIZE_MB)"
   Write-Host "WATCHDOG_INTERVAL_SECONDS: $($Config.WATCHDOG_INTERVAL_SECONDS)"
-  Write-Host "SHOW_STARTUP_LOGS: $($Config.SHOW_STARTUP_LOGS)"
   Write-Host "AUTO_INSTALL_PYFTPDLIB: $($Config.AUTO_INSTALL_PYFTPDLIB)"
   Write-Host "ENABLE_FRONTEND: $($Config.ENABLE_FRONTEND)"
   Write-Host ""
@@ -386,11 +358,9 @@ while ($true) {
   Write-Host "6. Set username/password"
   Write-Host "7. Set FTP encoding"
   Write-Host "8. Toggle frontend"
-  Write-Host "9. Set max download size"
-  Write-Host "10. Toggle startup logs"
-  Write-Host "11. Check/repair environment"
-  Write-Host "12. Save and exit"
-  Write-Host "13. Exit without saving"
+  Write-Host "9. Check/repair environment"
+  Write-Host "10. Save and exit"
+  Write-Host "11. Exit without saving"
   Write-Host ""
 
   $choice = Read-Choice "Choose"
@@ -439,22 +409,13 @@ while ($true) {
         Save-Config $config
       }
       "9" {
-        Write-Host "Maximum MB allowed for download/open. Use 0 for unlimited."
-        $config.MAX_DOWNLOAD_SIZE_MB = Read-Choice "MAX_DOWNLOAD_SIZE_MB"
-        Save-Config $config
-      }
-      "10" {
-        $config.SHOW_STARTUP_LOGS = if ((Normalize-Bool $config.SHOW_STARTUP_LOGS) -eq "true") { "false" } else { "true" }
-        Save-Config $config
-      }
-      "11" {
         Repair-Environment
       }
-      "12" {
+      "10" {
         Save-Config $config
         exit 0
       }
-      "13" {
+      "11" {
         exit 0
       }
       default {

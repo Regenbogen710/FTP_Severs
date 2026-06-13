@@ -56,8 +56,6 @@ PORT=21
 PERMISSION=readonly
 ALLOW_ANONYMOUS=true
 FTP_ENCODING=system
-MAX_DOWNLOAD_SIZE_MB=100
-SHOW_STARTUP_LOGS=true
 ```
 
 说明：
@@ -68,8 +66,6 @@ SHOW_STARTUP_LOGS=true
 - `PERMISSION`：权限模式。
 - `ALLOW_ANONYMOUS`：是否允许匿名访问。
 - `FTP_ENCODING`：FTP 命令与路径编码，默认 `system`，跟随系统首选编码。
-- `MAX_DOWNLOAD_SIZE_MB`：单个文件下载或双击打开的最大体积，默认 `100` MB，设置为 `0` 表示不限制。
-- `SHOW_STARTUP_LOGS`：启动窗口是否显示最近的守护进程/服务日志，默认 `true`。设置为 `false` 时不在窗口输出，但日志仍写入 `logs/`。
 
 ## FTP 文件夹限制
 
@@ -152,30 +148,6 @@ config.bat
 ```
 
 然后选择 `Set FTP encoding`。
-
-## 双击查看与大文件限制
-
-在 Windows 资源管理器中访问 FTP 文件夹时，双击 PDF、图片、文本等文件，会由资源管理器请求下载该文件，再交给系统默认程序打开。
-
-这种双击打开属于临时访问。临时访问产生的下载文件位于访问者电脑的客户端缓存中，退出查看器或资源管理器后由客户端系统清理。FTP 服务端不能强制删除访问者电脑上的本地缓存副本，因此不要把它当作严格的“不可落盘”访问方式。
-
-服务端会在下载前检查文件大小：
-
-```ini
-MAX_DOWNLOAD_SIZE_MB=100
-```
-
-- 小于或等于该大小的文件可以正常打开或下载。
-- 大于该大小的文件会被 FTP 服务拒绝，客户端会收到 `550 File too large`。
-- 如确实需要不限制大小，可设置为 `0`。
-
-终端修改方式：
-
-```text
-config.bat
-```
-
-然后选择 `Set max download size`。
 
 ## 环境检查与自动补全
 
@@ -275,14 +247,6 @@ stop_control_panel.bat
 - `.ftp_runtime/`：运行时文件，例如 PID 文件和本地依赖包。
 
 这些文件夹由脚本自动创建。
-
-如果不希望 `start.bat` 或 `start_ftp_server.bat` 在启动后显示最近日志，可设置：
-
-```ini
-SHOW_STARTUP_LOGS=false
-```
-
-该开关只影响启动窗口显示，不影响日志文件写入。
 
 ## 安全建议
 

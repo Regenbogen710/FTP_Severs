@@ -17,15 +17,6 @@ if not exist "%CONFIG_FILE%" (
   exit /b 1
 )
 
-set "SHOW_STARTUP_LOGS=true"
-for /f "usebackq tokens=1,* delims==" %%A in ("%CONFIG_FILE%") do (
-  if /i "%%~A"=="SHOW_STARTUP_LOGS" set "SHOW_STARTUP_LOGS=%%~B"
-)
-set "SHOW_STARTUP_LOGS_ENABLED=false"
-for %%V in (1 true yes y on) do (
-  if /i "%SHOW_STARTUP_LOGS%"=="%%V" set "SHOW_STARTUP_LOGS_ENABLED=true"
-)
-
 if not exist "scripts\ftp_watchdog.ps1" (
   echo Missing scripts\ftp_watchdog.ps1
   pause
@@ -65,12 +56,7 @@ start "FTP Watchdog B" /min powershell -NoProfile -ExecutionPolicy Bypass -Windo
 echo.
 echo Started. Use stop_ftp_server.bat to stop the FTP service and watchdogs.
 echo.
-if /i "%SHOW_STARTUP_LOGS_ENABLED%"=="true" (
-  echo Waiting briefly for startup logs...
-  timeout /t 2 /nobreak >nul
-  powershell -NoProfile -ExecutionPolicy Bypass -Command "$paths = @('logs\watchdog.log','logs\ftp_server.err.log','logs\ftp_server.out.log'); foreach ($path in $paths) { if (Test-Path -LiteralPath $path) { Write-Host ''; Write-Host ('--- ' + $path + ' tail ---'); Get-Content -LiteralPath $path -Tail 20 -Encoding UTF8 } }"
-) else (
-  echo Startup log display is disabled by SHOW_STARTUP_LOGS=false.
-  echo Logs are still written under: %CD%\logs
-)
+echo Waiting briefly for startup logs...
+timeout /t 2 /nobreak >nul
+powershell -NoProfile -ExecutionPolicy Bypass -Command "$paths = @('logs\watchdog.log','logs\ftp_server.err.log','logs\ftp_server.out.log'); foreach ($path in $paths) { if (Test-Path -LiteralPath $path) { Write-Host ''; Write-Host ('--- ' + $path + ' tail ---'); Get-Content -LiteralPath $path -Tail 20 -Encoding UTF8 } }"
 pause

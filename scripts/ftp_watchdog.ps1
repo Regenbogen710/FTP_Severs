@@ -400,11 +400,6 @@ function Start-FtpServer {
   $hostValue = Get-ConfigValue $Config "HOST" "127.0.0.1"
   $portValue = Get-ConfigValue $Config "PORT" "21"
   $permissionValue = Resolve-Permissions $Config
-  $maxDownloadSizeMb = Get-ConfigValue $Config "MAX_DOWNLOAD_SIZE_MB" "100"
-  $maxDownloadNumber = 0
-  if (-not [int]::TryParse($maxDownloadSizeMb, [ref]$maxDownloadNumber) -or $maxDownloadNumber -lt 0) {
-    throw "MAX_DOWNLOAD_SIZE_MB must be a non-negative number."
-  }
 
   $env:PYTHONPATH = $PackageDir
   $env:FTP_ROOT = $root
@@ -416,7 +411,6 @@ function Start-FtpServer {
   $env:FTP_PASSWORD = Get-ConfigValue $Config "PASSWORD" "change-me-before-use"
   $env:FTP_PASSIVE_PORTS = Get-ConfigValue $Config "PASSIVE_PORTS" "60000-60050"
   $env:FTP_ENCODING = Get-ConfigValue $Config "FTP_ENCODING" "system"
-  $env:FTP_MAX_DOWNLOAD_SIZE_MB = [string]$maxDownloadNumber
 
   if ($env:FTP_ALLOW_ANONYMOUS.ToLowerInvariant() -ne "true") {
     if ($env:FTP_PASSWORD -eq "" -or $env:FTP_PASSWORD -eq "ftp" -or $env:FTP_PASSWORD -eq "change-me-before-use") {
@@ -438,7 +432,7 @@ function Start-FtpServer {
 
   Set-Content -LiteralPath $PidPath -Value $process.Id -Encoding ASCII
   Set-Content -LiteralPath $ServerStartedPath -Value ("started pid={0} at {1}" -f $process.Id, (Get-Date -Format "yyyy-MM-dd HH:mm:ss")) -Encoding UTF8
-  Write-Log ("Started FTP server pid={0}, root={1}, port={2}, permissions={3}, maxDownloadMb={4}" -f $process.Id, $root, $portValue, $permissionValue, $maxDownloadNumber)
+  Write-Log ("Started FTP server pid={0}, root={1}, port={2}, permissions={3}" -f $process.Id, $root, $portValue, $permissionValue)
 }
 
 function Ensure-ServerRunning {
