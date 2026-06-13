@@ -1,5 +1,6 @@
 import argparse
 import codecs
+import ctypes
 import ipaddress
 import json
 import mimetypes
@@ -10,6 +11,7 @@ import socket
 import subprocess
 import sys
 import time
+from ctypes import wintypes
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import urlparse
@@ -309,11 +311,53 @@ def config_for_client(config):
 def process_alive(pid):
     if not pid:
         return False
+    if sys.platform.startswith("win"):
+        handle = ctypes.windll.kernel32.OpenProcess(0x1000, False, int(pid))
+        if not handle:
+            return False
+        try:
+            exit_code = wintypes.DWORD()
+            ok = ctypes.windll.kernel32.GetExitCodeProcess(handle, ctypes.byref(exit_code))
+            return bool(ok) and exit_code.value == 259
+        finally:
+            ctypes.windll.kernel32.CloseHandle(handle)
     try:
         os.kill(pid, 0)
         return True
     except OSError:
         return False
+
+
+def process_text(pid):
+    if not pid or not sys.platform.startswith("win"):
+        return ""
+    ps = (
+        "$p=Get-CimInstance Win32_Process -Filter 'ProcessId = "
+        f"{int(pid)}' -ErrorAction SilentlyContinue; "
+        "if ($p) { ($p.CommandLine + ' ' + $p.ExecutablePath) }"
+    )
+    try:
+        result = subprocess.run(
+            ["powershell", "-NoProfile", "-Command", ps],
+            cwd=str(BASE_DIR),
+            check=False,
+            capture_output=True,
+            text=True,
+            timeout=2,
+            creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0),
+        )
+    except (OSError, subprocess.SubprocessError):
+        return ""
+    return (result.stdout or "").strip().lower()
+
+
+def process_matches(pid, expected_tokens):
+    if not process_alive(pid):
+        return False
+    text = process_text(pid)
+    if not text:
+        return True
+    return str(BASE_DIR).lower() in text and any(token.lower() in text for token in expected_tokens)
 
 
 def read_pid(name):
@@ -340,11 +384,14 @@ def get_status():
     ftp_pid = read_pid("ftp_server.pid")
     watchdog_a = read_pid("watchdog-A.pid")
     watchdog_b = read_pid("watchdog-B.pid")
-    ftp_running = process_alive(ftp_pid)
+    ftp_running = process_matches(ftp_pid, ("ftp_server.py", "ftp_server.exe"))
     port_reachable = port_open(config["HOST"], config["PORT"])
-    watchdogs = []
-    watchdogs.append("A:运行" if process_alive(watchdog_a) else "A:停止")
-    watchdogs.append("B:运行" if process_alive(watchdog_b) else "B:停止")
+    watchdog_a_alive = process_matches(watchdog_a, ("ftp_watchdog.ps1",))
+    watchdog_b_alive = process_matches(watchdog_b, ("ftp_watchdog.ps1",))
+    watchdogs = [
+        f"A:running(pid={watchdog_a})" if watchdog_a_alive else "A:stopped",
+        f"B:running(pid={watchdog_b})" if watchdog_b_alive else "B:stopped",
+    ]
     return {
         "ftpRunning": ftp_running or port_reachable,
         "ftpPid": ftp_pid,

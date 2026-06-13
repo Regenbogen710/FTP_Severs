@@ -44,7 +44,10 @@ if exist ".ftp_runtime\ftp_server.started" del /f /q ".ftp_runtime\ftp_server.st
 
 echo Starting FTP server with dual watchdogs...
 echo Config: %CD%\%CONFIG_FILE%
-echo Logs:   %CD%\logs
+echo Logs:
+echo   %CD%\logs\watchdog.log
+echo   %CD%\logs\ftp_server.out.log
+echo   %CD%\logs\ftp_server.err.log
 echo Terminal config: config.bat
 
 start "FTP Watchdog A" /min powershell -NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -File "%~dp0scripts\ftp_watchdog.ps1" -WatchdogName A
@@ -52,4 +55,8 @@ start "FTP Watchdog B" /min powershell -NoProfile -ExecutionPolicy Bypass -Windo
 
 echo.
 echo Started. Use stop_ftp_server.bat to stop the FTP service and watchdogs.
+echo.
+echo Waiting briefly for startup logs...
+timeout /t 2 /nobreak >nul
+powershell -NoProfile -ExecutionPolicy Bypass -Command "$paths = @('logs\watchdog.log','logs\ftp_server.err.log','logs\ftp_server.out.log'); foreach ($path in $paths) { if (Test-Path -LiteralPath $path) { Write-Host ''; Write-Host ('--- ' + $path + ' tail ---'); Get-Content -LiteralPath $path -Tail 20 -Encoding UTF8 } }"
 pause
