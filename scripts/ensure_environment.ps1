@@ -210,6 +210,14 @@ function Ensure-Pip {
   }
 }
 
+function Assert-PackageSpec {
+  param([string]$PackageSpec)
+
+  if ($PackageSpec -notmatch "^[A-Za-z0-9_.-]+([=<>!~]{1,2}[A-Za-z0-9_.-]+)?$") {
+    throw "PYFTPDLIB_PACKAGE must be a simple package name or pinned version."
+  }
+}
+
 function Test-Pyftpdlib {
   param([hashtable]$Python)
 
@@ -234,6 +242,7 @@ function Install-Pyftpdlib {
   Ensure-Pip $Python
   New-Item -ItemType Directory -Force -Path $PackageDir | Out-Null
   $packageSpec = Get-ConfigValue $Config "PYFTPDLIB_PACKAGE" "pyftpdlib"
+  Assert-PackageSpec $packageSpec
   Write-Host "Installing $packageSpec into $PackageDir ..." -ForegroundColor Cyan
   Invoke-Python $Python @("-m", "pip", "install", "--upgrade", "--target", $PackageDir, $packageSpec) | Out-Null
   if ($LASTEXITCODE -ne 0) {

@@ -9,6 +9,11 @@ __pycache__/
 .venv/
 venv/
 
+# Local secrets
+.env
+.env.*
+!.env.example
+
 # Build scratch space
 .build_deps/
 .dist_build/

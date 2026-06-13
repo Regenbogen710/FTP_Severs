@@ -309,6 +309,14 @@ function Invoke-Python {
   & $Python.File @($Python.PrefixArgs + $Arguments)
 }
 
+function Assert-PackageSpec {
+  param([string]$PackageSpec)
+
+  if ($PackageSpec -notmatch "^[A-Za-z0-9_.-]+([=<>!~]{1,2}[A-Za-z0-9_.-]+)?$") {
+    throw "PYFTPDLIB_PACKAGE must be a simple package name or pinned version."
+  }
+}
+
 function Ensure-Pyftpdlib {
   param(
     [hashtable]$Python,
@@ -333,6 +341,7 @@ function Ensure-Pyftpdlib {
   }
 
   $packageSpec = Get-ConfigValue $Config "PYFTPDLIB_PACKAGE" "pyftpdlib"
+  Assert-PackageSpec $packageSpec
   Write-Log "Installing $packageSpec into $packageDir"
   Invoke-Python $Python @("-m", "pip", "install", "--target", $packageDir, $packageSpec) | Out-Null
   if ($LASTEXITCODE -ne 0) {
