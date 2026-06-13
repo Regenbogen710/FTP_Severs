@@ -56,6 +56,7 @@ PORT=21
 PERMISSION=readonly
 ALLOW_ANONYMOUS=true
 FTP_ENCODING=system
+MAX_DOWNLOAD_SIZE_MB=100
 ```
 
 说明：
@@ -66,6 +67,7 @@ FTP_ENCODING=system
 - `PERMISSION`：权限模式。
 - `ALLOW_ANONYMOUS`：是否允许匿名访问。
 - `FTP_ENCODING`：FTP 命令与路径编码，默认 `system`，跟随系统首选编码。
+- `MAX_DOWNLOAD_SIZE_MB`：单个文件下载或双击打开的最大体积，默认 `100` MB，设置为 `0` 表示不限制。
 
 ## FTP 文件夹限制
 
@@ -148,6 +150,28 @@ config.bat
 ```
 
 然后选择 `Set FTP encoding`。
+
+## 双击查看与大文件限制
+
+在 Windows 资源管理器中访问 FTP 文件夹时，双击 PDF、图片、文本等文件，会由资源管理器请求下载该文件，再交给系统默认程序打开。
+
+服务端会在下载前检查文件大小：
+
+```ini
+MAX_DOWNLOAD_SIZE_MB=100
+```
+
+- 小于或等于该大小的文件可以正常打开或下载。
+- 大于该大小的文件会被 FTP 服务拒绝，客户端会收到 `550 File too large`。
+- 如确实需要不限制大小，可设置为 `0`。
+
+终端修改方式：
+
+```text
+config.bat
+```
+
+然后选择 `Set max download size`。
 
 ## 环境检查与自动补全
 

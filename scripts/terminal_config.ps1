@@ -22,6 +22,7 @@ $ConfigOrder = @(
   "PASSWORD",
   "PASSIVE_PORTS",
   "FTP_ENCODING",
+  "MAX_DOWNLOAD_SIZE_MB",
   "WATCHDOG_INTERVAL_SECONDS",
   "AUTO_INSTALL_PYFTPDLIB",
   "PYFTPDLIB_PACKAGE",
@@ -40,6 +41,7 @@ $Defaults = @{
   PASSWORD = "change-me-before-use"
   PASSIVE_PORTS = "60000-60050"
   FTP_ENCODING = "system"
+  MAX_DOWNLOAD_SIZE_MB = "100"
   WATCHDOG_INTERVAL_SECONDS = "5"
   AUTO_INSTALL_PYFTPDLIB = "false"
   PYFTPDLIB_PACKAGE = "pyftpdlib"
@@ -113,6 +115,10 @@ PASSIVE_PORTS=$($Config.PASSIVE_PORTS)
 # Common values: system, utf-8, gbk, gb2312, big5, cp936
 FTP_ENCODING=$($Config.FTP_ENCODING)
 
+# Maximum file size allowed for FTP download/open requests.
+# Set 0 for unlimited.
+MAX_DOWNLOAD_SIZE_MB=$($Config.MAX_DOWNLOAD_SIZE_MB)
+
 # Watchdog behavior.
 WATCHDOG_INTERVAL_SECONDS=$($Config.WATCHDOG_INTERVAL_SECONDS)
 
@@ -183,6 +189,19 @@ function Validate-Port {
   }
   if ($number -lt $Min -or $number -gt 65535) {
     throw "$Name must be between $Min and 65535."
+  }
+  return [string]$number
+}
+
+function Validate-NonNegativeInt {
+  param([string]$Name, [string]$Value, [int]$Max = 1048576)
+  Assert-NoNewline $Name $Value
+  $number = 0
+  if (-not [int]::TryParse($Value, [ref]$number)) {
+    throw "$Name must be a number."
+  }
+  if ($number -lt 0 -or $number -gt $Max) {
+    throw "$Name must be between 0 and $Max."
   }
   return [string]$number
 }
@@ -290,6 +309,7 @@ function Validate-Config {
 
   $Config.PASSIVE_PORTS = Validate-PassivePorts $Config.PASSIVE_PORTS
   $Config.FTP_ENCODING = Validate-Encoding $Config.FTP_ENCODING
+  $Config.MAX_DOWNLOAD_SIZE_MB = Validate-NonNegativeInt "MAX_DOWNLOAD_SIZE_MB" $Config.MAX_DOWNLOAD_SIZE_MB
   $interval = [int](Validate-Port "WATCHDOG_INTERVAL_SECONDS" $Config.WATCHDOG_INTERVAL_SECONDS)
   if ($interval -gt 3600) {
     throw "WATCHDOG_INTERVAL_SECONDS must be 3600 or less."
@@ -323,6 +343,7 @@ function Show-Config {
   Write-Host "DANGEROUS_ALLOW_ANONYMOUS_DELETE: $($Config.DANGEROUS_ALLOW_ANONYMOUS_DELETE)"
   Write-Host "PASSIVE_PORTS: $($Config.PASSIVE_PORTS)"
   Write-Host "FTP_ENCODING: $($Config.FTP_ENCODING)"
+  Write-Host "MAX_DOWNLOAD_SIZE_MB: $($Config.MAX_DOWNLOAD_SIZE_MB)"
   Write-Host "WATCHDOG_INTERVAL_SECONDS: $($Config.WATCHDOG_INTERVAL_SECONDS)"
   Write-Host "AUTO_INSTALL_PYFTPDLIB: $($Config.AUTO_INSTALL_PYFTPDLIB)"
   Write-Host "ENABLE_FRONTEND: $($Config.ENABLE_FRONTEND)"
@@ -358,9 +379,10 @@ while ($true) {
   Write-Host "6. Set username/password"
   Write-Host "7. Set FTP encoding"
   Write-Host "8. Toggle frontend"
-  Write-Host "9. Check/repair environment"
-  Write-Host "10. Save and exit"
-  Write-Host "11. Exit without saving"
+  Write-Host "9. Set max download size"
+  Write-Host "10. Check/repair environment"
+  Write-Host "11. Save and exit"
+  Write-Host "12. Exit without saving"
   Write-Host ""
 
   $choice = Read-Choice "Choose"
@@ -409,13 +431,18 @@ while ($true) {
         Save-Config $config
       }
       "9" {
-        Repair-Environment
+        Write-Host "Maximum MB allowed for download/open. Use 0 for unlimited."
+        $config.MAX_DOWNLOAD_SIZE_MB = Read-Choice "MAX_DOWNLOAD_SIZE_MB"
+        Save-Config $config
       }
       "10" {
+        Repair-Environment
+      }
+      "11" {
         Save-Config $config
         exit 0
       }
-      "11" {
+      "12" {
         exit 0
       }
       default {

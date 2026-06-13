@@ -43,6 +43,7 @@ CONFIG_KEYS = [
     "PASSWORD",
     "PASSIVE_PORTS",
     "FTP_ENCODING",
+    "MAX_DOWNLOAD_SIZE_MB",
     "WATCHDOG_INTERVAL_SECONDS",
     "AUTO_INSTALL_PYFTPDLIB",
     "PYFTPDLIB_PACKAGE",
@@ -61,6 +62,7 @@ DEFAULT_CONFIG = {
     "PASSWORD": "change-me-before-use",
     "PASSIVE_PORTS": "60000-60050",
     "FTP_ENCODING": "system",
+    "MAX_DOWNLOAD_SIZE_MB": "100",
     "WATCHDOG_INTERVAL_SECONDS": "5",
     "AUTO_INSTALL_PYFTPDLIB": "false",
     "PYFTPDLIB_PACKAGE": "pyftpdlib",
@@ -139,6 +141,10 @@ PASSIVE_PORTS={config["PASSIVE_PORTS"]}
 # Common values: system, utf-8, gbk, gb2312, big5, cp936
 FTP_ENCODING={config["FTP_ENCODING"]}
 
+# Maximum file size allowed for FTP download/open requests.
+# Set 0 for unlimited.
+MAX_DOWNLOAD_SIZE_MB={config["MAX_DOWNLOAD_SIZE_MB"]}
+
 # Watchdog behavior.
 WATCHDOG_INTERVAL_SECONDS={config["WATCHDOG_INTERVAL_SECONDS"]}
 AUTO_INSTALL_PYFTPDLIB={config["AUTO_INSTALL_PYFTPDLIB"]}
@@ -205,6 +211,17 @@ def validate_port(name, value, minimum=1):
     if port < minimum or port > 65535:
         raise ValueError(f"{name} must be between {minimum} and 65535.")
     return str(port)
+
+
+def validate_non_negative_int(name, value, maximum=1048576):
+    reject_newline(name, value)
+    try:
+        number = int(value)
+    except ValueError as exc:
+        raise ValueError(f"{name} must be a number.") from exc
+    if number < 0 or number > maximum:
+        raise ValueError(f"{name} must be between 0 and {maximum}.")
+    return str(number)
 
 
 def validate_passive_ports(value):
@@ -290,6 +307,9 @@ def validate_config(input_config, existing_config=None):
 
     config["PASSIVE_PORTS"] = validate_passive_ports(config["PASSIVE_PORTS"])
     config["FTP_ENCODING"] = validate_encoding(config["FTP_ENCODING"])
+    config["MAX_DOWNLOAD_SIZE_MB"] = validate_non_negative_int(
+        "MAX_DOWNLOAD_SIZE_MB", config["MAX_DOWNLOAD_SIZE_MB"]
+    )
 
     interval = int(validate_port("WATCHDOG_INTERVAL_SECONDS", config["WATCHDOG_INTERVAL_SECONDS"]))
     if interval > 3600:

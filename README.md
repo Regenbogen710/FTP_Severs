@@ -44,6 +44,7 @@ ftp://192.168.110.107
 | `ALLOW_ANONYMOUS` | 是否允许匿名访问。关闭后使用 `USERNAME` 和 `PASSWORD`。 |
 | `PASSIVE_PORTS` | 被动模式端口范围，防火墙放行时会用到。 |
 | `FTP_ENCODING` | FTP 命令和路径编码，默认 `system`，即跟随系统编码。 |
+| `MAX_DOWNLOAD_SIZE_MB` | 单个文件下载/双击打开的最大体积，默认 `100`，设置为 `0` 表示不限制。 |
 | `ENABLE_FRONTEND` | 是否启用 WebUI，默认 `false`。 |
 | `WATCHDOG_INTERVAL_SECONDS` | 守护进程检查间隔。 |
 | `AUTO_INSTALL_PYFTPDLIB` | 是否允许隐藏守护进程直接安装依赖，默认 `false`。普通启动流程会先在终端询问。 |
@@ -68,6 +69,7 @@ ftp://192.168.110.107
 
 - FTP 根目录不能位于 Windows 系统盘，程序会在启动前检查并拒绝。
 - 默认不开放删除权限，尤其不要长期允许匿名删除。
+- 默认拒绝下载或双击打开超过 `MAX_DOWNLOAD_SIZE_MB` 的单个文件，避免资源管理器把过大的文件拉到本机缓存。
 - 默认不开启 WebUI，日常配置请使用终端入口。
 - 该工具面向实验室局域网使用，不建议直接暴露到公网。
 - 修改权限后建议重新启动服务，让配置完全生效。
